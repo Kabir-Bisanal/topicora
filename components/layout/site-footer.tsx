@@ -1,0 +1,45 @@
+import Image from "next/image";
+import Link from "next/link";
+
+import { Container } from "@/components/ui/container";
+
+const policyLinks = [
+  ["Privacy", "/privacy"],
+  ["Terms", "/terms"],
+  ["Disclaimer", "/disclaimer"],
+  ["Editorial policy", "/editorial-policy"],
+  ["Corrections", "/corrections-policy"],
+];
+
+export function SiteFooter() {
+  return (
+    <footer className="no-print mt-24 border-t border-border bg-surface py-12">
+      <Container className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+        <div>
+          <Image src="/logo.svg" alt="Topicora" width={160} height={36} className="h-8 w-auto dark:invert" />
+          <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
+            Useful ideas, wherever curiosity leads. An India-first English publication for thoughtful, practical reading.
+          </p>
+        </div>
+        <nav aria-label="Publication">
+          <p className="eyebrow mb-3">Publication</p>
+          <div className="grid gap-2 text-sm">
+            <Link href="/articles">Article archive</Link>
+            <Link href="/about">About</Link>
+            <Link href="/contact">Contact</Link>
+            <Link href="/rss.xml">RSS feed</Link>
+          </div>
+        </nav>
+        <nav aria-label="Policies">
+          <p className="eyebrow mb-3">Trust</p>
+          <div className="grid gap-2 text-sm">
+            {policyLinks.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
+          </div>
+        </nav>
+      </Container>
+      <Container className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
+        © {new Date().getFullYear()} Topicora. Built for careful curiosity.
+      </Container>
+    </footer>
+  );
+}

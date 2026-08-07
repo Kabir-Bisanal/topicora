@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title">
+  <title id="title">Magnifying glass checking a social media post</title>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1dcc7"/><stop offset="1" stop-color="#e8c890"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="20" stdDeviation="28" flood-opacity=".16"/></filter></defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect x="245" y="150" width="850" height="660" rx="42" fill="#fffdf8" filter="url(#s)"/>
+  <circle cx="365" cy="275" r="48" fill="#8fb5ab"/><rect x="440" y="245" width="390" height="24" rx="12" fill="#767771"/><rect x="440" y="290" width="250" height="16" rx="8" fill="#c3c1b9"/>
+  <rect x="335" y="385" width="665" height="250" rx="24" fill="#dce9e3"/>
+  <path d="m400 570 120-105 105 80 110-125 195 150" fill="none" stroke="#315b54" stroke-width="22" stroke-linejoin="round"/>
+  <rect x="335" y="690" width="490" height="18" rx="9" fill="#aaa9a1"/><rect x="335" y="735" width="350" height="16" rx="8" fill="#cbc8bf"/>
+  <circle cx="1085" cy="585" r="245" fill="none" stroke="#315b54" stroke-width="55"/>
+  <path d="m1265 770 205 180" stroke="#315b54" stroke-width="76" stroke-linecap="round"/>
+  <path d="m988 585 70 70 135-160" fill="none" stroke="#315b54" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

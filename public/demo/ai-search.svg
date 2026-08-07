@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title">
+  <title id="title">Search interface transforming into a conversation</title>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ddebe4"/><stop offset="1" stop-color="#8db4aa"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="24" flood-opacity=".13"/></filter></defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <circle cx="1340" cy="160" r="260" fill="#f6e6b4" opacity=".65"/>
+  <rect x="180" y="290" width="690" height="150" rx="75" fill="#fffdf8" filter="url(#shadow)"/>
+  <circle cx="280" cy="365" r="35" fill="none" stroke="#315b54" stroke-width="18"/><path d="m306 392 35 35" stroke="#315b54" stroke-width="18" stroke-linecap="round"/>
+  <rect x="375" y="340" width="360" height="20" rx="10" fill="#b5b4ad"/><rect x="375" y="382" width="230" height="16" rx="8" fill="#d0cec5"/>
+  <path d="M930 270h350c80 0 145 65 145 145v150c0 80-65 145-145 145h-120l-105 96 24-96H930c-80 0-145-65-145-145V415c0-80 65-145 145-145Z" fill="#315b54" filter="url(#shadow)"/>
+  <rect x="915" y="400" width="370" height="22" rx="11" fill="#d8eee7"/><rect x="915" y="455" width="310" height="18" rx="9" fill="#aacfc4"/><rect x="915" y="505" width="345" height="18" rx="9" fill="#aacfc4"/><circle cx="1295" cy="335" r="18" fill="#f6e6b4"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title">
+  <title id="title">Phone with a sequence of short video cards</title>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9d7e8"/><stop offset="1" stop-color="#8076a8"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="24" stdDeviation="28" flood-opacity=".2"/></filter></defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <g opacity=".55"><circle cx="230" cy="180" r="115" fill="#f9e6a9"/><circle cx="1370" cy="780" r="180" fill="#73a69a"/></g>
+  <rect x="520" y="70" width="560" height="860" rx="82" fill="#171918" filter="url(#s)"/>
+  <rect x="548" y="105" width="504" height="790" rx="58" fill="#f8f5ee"/>
+  <rect x="610" y="145" width="380" height="600" rx="34" fill="#315b54"/>
+  <path d="m740 350 190 95-190 95Z" fill="#f8f5ee" opacity=".95"/>
+  <circle cx="970" cy="670" r="25" fill="#f4cc78"/><circle cx="970" cy="595" r="25" fill="#fffdf8"/><circle cx="970" cy="520" r="25" fill="#d4a4ca"/>
+  <rect x="630" y="780" width="290" height="18" rx="9" fill="#9f9d96"/><rect x="630" y="820" width="200" height="15" rx="8" fill="#c3c0b7"/>
+  <path d="M335 250h130M320 500h145M1135 360h150M1135 625h115" stroke="#fffdf8" stroke-width="22" stroke-linecap="round" opacity=".8"/>
+</svg>

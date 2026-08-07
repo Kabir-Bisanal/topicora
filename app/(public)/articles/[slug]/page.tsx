@@ -35,7 +35,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   if (!article) notFound();
   const [related, navigation] = await Promise.all([getRelatedArticles(article), getArticleNavigation(article)]);
   const toc = extractTableOfContents(article.contentMarkdown);
-  const canonical = absoluteUrl(`/articles/${article.slug}`);
+  const canonical = article.canonicalUrl || absoluteUrl(`/articles/${article.slug}`);
   const imageUrl = absoluteUrl(article.coverImageUrl);
   const articleJsonLd = {
     "@context": "https://schema.org",

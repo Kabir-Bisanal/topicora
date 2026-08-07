@@ -8,7 +8,7 @@ export function absoluteUrl(path = "/") {
 }
 
 export function articleMetadata(article: PublicArticle): Metadata {
-  const canonical = absoluteUrl(`/articles/${article.slug}`);
+  const canonical = article.canonicalUrl || absoluteUrl(`/articles/${article.slug}`);
   const image = absoluteUrl(`/articles/${article.slug}/opengraph-image`);
   return {
     title: article.seoTitle,

@@ -37,6 +37,7 @@ export type DemoArticle = {
   updatedAt: string;
   seoTitle: string;
   seoDescription: string;
+  canonicalUrl?: string | null;
   readingTimeMinutes: number;
 };
 

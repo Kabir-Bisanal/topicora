@@ -11,6 +11,18 @@ export const siteSettingsSchema = z.object({
       if (!Array.isArray(parsed)) throw new Error();
       for (const item of parsed) {
         if (!item || typeof item !== "object" || !("from" in item) || !("to" in item)) throw new Error();
+        const rule = item as { from?: unknown; to?: unknown };
+        if (
+          typeof rule.from !== "string" ||
+          typeof rule.to !== "string" ||
+          !rule.from.startsWith("/") ||
+          !rule.to.startsWith("/") ||
+          rule.from.startsWith("//") ||
+          rule.to.startsWith("//") ||
+          rule.from === rule.to ||
+          rule.from.startsWith("/admin") ||
+          rule.to.startsWith("/admin")
+        ) throw new Error();
       }
     } catch {
       context.addIssue({ code: "custom", message: "Redirects must be a JSON array of { from, to } objects." });

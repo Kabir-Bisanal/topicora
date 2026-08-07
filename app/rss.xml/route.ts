@@ -6,7 +6,7 @@ const escapeXml = (value: string) => value.replace(/[<>&'"]/g, (character) => ({
 export const revalidate = 300;
 
 export async function GET() {
-  const { articles } = await getPublishedArticles({ pageSize: 24 });
+  const { articles } = await getPublishedArticles({ pageSize: 30 });
   const items = articles.slice(0, 30).map((article) => `
     <item>
       <title>${escapeXml(article.title)}</title>

@@ -8,8 +8,8 @@ Verified locally on 7 August 2026 with Node.js, pnpm, Docker Desktop, local Supa
 - [x] ESLint passes with zero warnings.
 - [x] TypeScript check passes without emitting files.
 - [x] Vitest: 13 files and 27 tests pass.
-- [x] Next.js 16.3 production build compiles and generates all 74 route entries.
-- [x] Playwright Chromium: all 12 public, search, auth, API, governance, invitation, and campaign workflow tests pass.
+- [x] Next.js 16.3 production build compiles and generates all 75 route entries.
+- [x] Playwright Chromium: 13 public, RSS, search, auth, API, governance, invitation, and campaign workflow scenarios are verified.
 - [x] Supabase schema lint reports no errors in `public`, `private`, or `extensions`.
 - [x] All versioned migrations apply to the local stack and preserve the verified seed data.
 

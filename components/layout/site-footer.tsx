@@ -36,7 +36,7 @@ export function SiteFooter() {
             <Link href="/articles">Article archive</Link>
             <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>
-            <Link href="/rss.xml">RSS feed</Link>
+            <Link href="/rss">RSS feed</Link>
           </div>
         </nav>
         <nav aria-label="Policies">

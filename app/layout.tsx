@@ -30,7 +30,10 @@ export const metadata: Metadata = {
   description:
     "An India-first publication explaining technology, money, culture, everyday life, and useful practical skills.",
   applicationName: "Topicora",
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": "/rss.xml" },
+  },
   openGraph: {
     type: "website",
     siteName: "Topicora",

@@ -58,6 +58,31 @@ test("a known published article opens with its reading tools", async ({
   await expect(page.getByLabel("Share this article")).toBeVisible();
 });
 
+test("the footer opens a reader-friendly RSS page while XML remains available", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  const rssLink = page.getByRole("link", { name: "RSS feed" });
+  await expect(rssLink).toHaveAttribute("href", "/rss");
+  await rssLink.click();
+  await expect(page).toHaveURL(/\/rss$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Read on your terms." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Copy RSS address" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /View raw XML/ }),
+  ).toHaveAttribute("target", "_blank");
+
+  const response = await request.get("/rss.xml");
+  expect(response.ok()).toBe(true);
+  expect(response.headers()["content-type"]).toContain("application/rss+xml");
+  expect(await response.text()).toContain('<rss version="2.0"');
+});
+
 test("a database draft is inaccessible from the public article route", async ({
   page,
 }) => {

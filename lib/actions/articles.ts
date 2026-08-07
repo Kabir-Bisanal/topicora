@@ -6,10 +6,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { calculateReadingTime } from "@/lib/article/reading-time";
+import { parseContentBlocks } from "@/lib/article/blocks";
 import { requireAdmin, requireStaff } from "@/lib/auth/server";
 import type { ActionState } from "@/lib/actions/state";
 import { fieldErrors } from "@/lib/actions/state";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   articleIdSchema,
   articleInputSchema,
@@ -47,6 +49,11 @@ function parseArticle(formData: FormData) {
     slug: formData.get("slug"),
     excerpt: formData.get("excerpt"),
     contentMarkdown: formData.get("content_markdown"),
+    contentBlocks: parseContentBlocks(
+      formData.get("content_blocks"),
+      String(formData.get("content_markdown") ?? ""),
+    ),
+    contentFormat: formData.get("content_format"),
     categoryId: formData.get("category_id"),
     tagIds: formData.getAll("tag_ids").map(String),
     status,
@@ -101,6 +108,8 @@ function articleRecord(
     slug: input.slug,
     excerpt: input.excerpt,
     content_markdown: input.contentMarkdown,
+    content_blocks: input.contentBlocks,
+    content_format: input.contentFormat,
     cover_image_url: coverImageUrl,
     cover_image_alt: input.coverImageAlt,
     cover_image_caption: input.coverImageCaption,
@@ -130,6 +139,28 @@ async function saveTags(
       );
     if (error) throw error;
   }
+}
+
+async function attachTagsToLatestRevision(articleId: string, tagIds: string[]) {
+  const admin = createAdminClient();
+  if (!admin) return;
+  const { data } = await admin
+    .from("article_revisions")
+    .select("id,snapshot")
+    .eq("article_id", articleId)
+    .order("revision_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return;
+  await admin
+    .from("article_revisions")
+    .update({
+      snapshot: {
+        ...(data.snapshot as Record<string, unknown>),
+        tag_ids: tagIds,
+      },
+    })
+    .eq("id", data.id);
 }
 
 function refreshPublic(slug: string) {
@@ -190,6 +221,7 @@ export async function createArticleAction(
             : "The article could not be created.",
       };
     await saveTags(supabase, id, parsed.data.tagIds);
+    await attachTagsToLatestRevision(id, parsed.data.tagIds);
   } catch (error) {
     return {
       ok: false,
@@ -267,6 +299,7 @@ export async function updateArticleAction(
             : "The article could not be saved.",
       };
     await saveTags(supabase, id, parsed.data.tagIds);
+    await attachTagsToLatestRevision(id, parsed.data.tagIds);
   } catch (error) {
     return {
       ok: false,
@@ -279,6 +312,77 @@ export async function updateArticleAction(
   refreshPublic(current.slug);
   refreshPublic(parsed.data.slug);
   redirect(`/admin/articles/${id}/edit?saved=1`);
+}
+
+export async function restoreArticleRevisionAction(
+  articleId: string,
+  revisionId: string,
+  _formData: FormData,
+) {
+  void _formData;
+  articleIdSchema.parse(articleId);
+  articleIdSchema.parse(revisionId);
+  await requireStaff(`/admin/articles/${articleId}/edit`);
+  const supabase = await createClient();
+  if (!supabase) return;
+  const [{ data: revision }, { data: current }] = await Promise.all([
+    supabase
+      .from("article_revisions")
+      .select("snapshot")
+      .eq("id", revisionId)
+      .eq("article_id", articleId)
+      .maybeSingle(),
+    supabase.from("articles").select("slug").eq("id", articleId).maybeSingle(),
+  ]);
+  if (!revision || !current) return;
+  const snapshot = revision.snapshot as Record<string, unknown>;
+  const fields = [
+    "category_id",
+    "title",
+    "slug",
+    "excerpt",
+    "content_markdown",
+    "content_blocks",
+    "content_format",
+    "cover_image_url",
+    "cover_image_alt",
+    "cover_image_caption",
+    "status",
+    "disclosure",
+    "disclosure_note",
+    "is_featured",
+    "published_at",
+    "seo_title",
+    "seo_description",
+    "canonical_url",
+    "reading_time_minutes",
+  ] as const;
+  const restored = Object.fromEntries(
+    fields
+      .filter((field) => field in snapshot)
+      .map((field) => [field, snapshot[field]]),
+  );
+  if (snapshot.is_featured === true)
+    await supabase
+      .from("articles")
+      .update({ is_featured: false })
+      .eq("is_featured", true)
+      .neq("id", articleId);
+  const { error } = await supabase
+    .from("articles")
+    .update(restored)
+    .eq("id", articleId);
+  if (error) return;
+  const tagIds = Array.isArray(snapshot.tag_ids)
+    ? snapshot.tag_ids.filter(
+        (value): value is string => typeof value === "string",
+      )
+    : [];
+  await saveTags(supabase, articleId, tagIds);
+  await attachTagsToLatestRevision(articleId, tagIds);
+  refreshPublic(current.slug);
+  if (typeof snapshot.slug === "string") refreshPublic(snapshot.slug);
+  revalidatePath(`/admin/articles/${articleId}/edit`);
 }
 
 export async function changeArticleStatusAction(

@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 export default function ErrorPage({
@@ -10,6 +11,7 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   useEffect(() => {
+    Sentry.captureException(error);
     if (process.env.NODE_ENV !== "production") console.error(error);
   }, [error]);
   return (

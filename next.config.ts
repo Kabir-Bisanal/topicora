@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : "";
+const sentryDsn =
+  process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN || "";
+const sentryOrigin = sentryDsn ? new URL(sentryDsn).origin : "";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -13,7 +17,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   `img-src 'self' data: blob: ${supabaseOrigin} https://*.supabase.co`,
-  `connect-src 'self' ${supabaseOrigin} https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com`,
+  `connect-src 'self' ${supabaseOrigin} ${sentryOrigin} https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://vitals.vercel-insights.com`,
   "media-src 'self'",
   "worker-src 'self' blob:",
   "upgrade-insecure-requests",
@@ -62,4 +66,20 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  telemetry: false,
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+    deleteSourcemapsAfterUpload: true,
+  },
+  webpack: {
+    automaticVercelMonitors: true,
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+});

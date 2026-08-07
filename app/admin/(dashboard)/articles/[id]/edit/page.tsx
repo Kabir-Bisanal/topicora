@@ -1,7 +1,12 @@
 import { notFound } from "next/navigation";
 
 import { ArticleEditor } from "@/components/admin/article-editor";
-import { getAdminArticle, getAdminTaxonomy } from "@/lib/db/admin";
+import { ArticleRevisionHistory } from "@/components/admin/article-revision-history";
+import {
+  getAdminArticle,
+  getAdminTaxonomy,
+  getArticleRevisions,
+} from "@/lib/db/admin";
 
 export default async function EditArticlePage({
   params,
@@ -11,10 +16,11 @@ export default async function EditArticlePage({
   searchParams: Promise<{ saved?: string }>;
 }) {
   const { id } = await params;
-  const [article, taxonomy, query] = await Promise.all([
+  const [article, taxonomy, query, revisions] = await Promise.all([
     getAdminArticle(id),
     getAdminTaxonomy(),
     searchParams,
+    getArticleRevisions(id),
   ]);
   if (!article) notFound();
   return (
@@ -32,6 +38,7 @@ export default async function EditArticlePage({
         categories={taxonomy.categories}
         tags={taxonomy.tags}
       />
+      <ArticleRevisionHistory articleId={id} revisions={revisions} />
     </div>
   );
 }

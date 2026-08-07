@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createSubscriberToken } from "@/lib/auth/subscriber-token";
 
 export async function GET(request: Request) {
   const token = new URL(request.url).searchParams.get("token");
@@ -35,7 +36,13 @@ export async function GET(request: Request) {
         unsubscribed_at: null,
       })
       .eq("id", data.id);
+  const preferencesToken = createSubscriberToken(data.id);
   return NextResponse.redirect(
-    new URL("/newsletter/confirmed?status=confirmed", request.url),
+    new URL(
+      preferencesToken
+        ? `/newsletter/preferences?welcome=1&token=${encodeURIComponent(preferencesToken)}`
+        : "/newsletter/confirmed?status=confirmed",
+      request.url,
+    ),
   );
 }

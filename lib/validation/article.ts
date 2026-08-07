@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { contentBlocksSchema } from "@/lib/article/blocks";
+
 export const articleStatusSchema = z.enum(["draft", "published", "archived"]);
 export const disclosureSchema = z.enum([
   "none",
@@ -20,6 +22,8 @@ export const articleInputSchema = z
       .max(100),
     excerpt: z.string().trim().min(20).max(500),
     contentMarkdown: z.string().trim().min(100),
+    contentBlocks: contentBlocksSchema,
+    contentFormat: z.literal("blocks"),
     categoryId: z.uuid(),
     tagIds: z.array(z.uuid()).max(12),
     status: articleStatusSchema,

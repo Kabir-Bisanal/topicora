@@ -16,6 +16,11 @@ export const publicEnvSchema = z.object({
     .enum(["true", "false"])
     .default("false")
     .transform((value) => value === "true"),
+  NEXT_PUBLIC_SENTRY_DSN: optionalUrl,
+  NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: z
+    .string()
+    .regex(/^(0(\.\d+)?|1(\.0+)?)$/)
+    .default("0.1"),
 });
 
 export const serverEnvSchema = publicEnvSchema.extend({
@@ -26,6 +31,11 @@ export const serverEnvSchema = publicEnvSchema.extend({
   ADMIN_EMAIL: z.union([z.literal(""), z.email()]).optional(),
   ADMIN_PASSWORD: z.union([z.literal(""), z.string().min(12)]).optional(),
   ADMIN_DISPLAY_NAME: z.string().trim().min(2).default("Topicora Editor"),
+  SENTRY_DSN: optionalUrl,
+  SENTRY_AUTH_TOKEN: z.string().trim().optional(),
+  SENTRY_ORG: z.string().trim().optional(),
+  SENTRY_PROJECT: z.string().trim().optional(),
+  CRON_SECRET: z.string().trim().min(32).optional(),
 });
 
 export type PublicEnv = z.infer<typeof publicEnvSchema>;

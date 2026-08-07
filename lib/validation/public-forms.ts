@@ -9,6 +9,13 @@ export const newsletterSchema = z.object({
   startedAt: z.coerce.number().int().positive(),
 });
 
+export const newsletterPreferencesSchema = z.object({
+  token: z.string().min(40).max(500),
+  topicSlugs: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)).max(30),
+  frequency: z.enum(["weekly", "monthly"]),
+  action: z.enum(["save", "unsubscribe"]),
+});
+
 export const contactSchema = z.object({
   name: z.string().trim().min(2).max(100),
   email: z.string().trim().toLowerCase().max(254).pipe(z.email()),

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 
-import { Markdown } from "@/components/article/markdown";
+import { BlockEditor } from "@/components/admin/block-editor";
 import {
   createArticleAction,
   updateArticleAction,
@@ -21,6 +21,7 @@ type EditableArticle = {
   slug: string;
   excerpt: string;
   content_markdown: string;
+  content_blocks: unknown;
   category_id: string;
   tag_ids: string[];
   status: "draft" | "published" | "archived";
@@ -72,8 +73,6 @@ export function ArticleEditor({
   const [title, setTitle] = useState(article?.title ?? "");
   const [slug, setSlug] = useState(article?.slug ?? "");
   const [slugEdited, setSlugEdited] = useState(Boolean(article));
-  const [content, setContent] = useState(article?.content_markdown ?? "");
-  const [preview, setPreview] = useState(false);
   const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
@@ -201,37 +200,10 @@ export function ArticleEditor({
           ) : null}
         </label>
         <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="text-sm font-bold" htmlFor="content_markdown">
-              Markdown content
-            </label>
-            <button
-              className="button-secondary min-h-9 px-3 py-1"
-              type="button"
-              onClick={() => setPreview((value) => !value)}
-            >
-              {preview ? "Edit" : "Preview"}
-            </button>
-          </div>
-          {preview ? (
-            <div className="border-border bg-background min-h-96 rounded-lg border p-5">
-              <Markdown
-                content={content || "*Start writing to preview your article.*"}
-              />
-            </div>
-          ) : (
-            <textarea
-              className="field min-h-[34rem] font-mono text-sm leading-6"
-              id="content_markdown"
-              name="content_markdown"
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-              required
-            />
-          )}
-          {preview ? (
-            <input type="hidden" name="content_markdown" value={content} />
-          ) : null}
+          <BlockEditor
+            initialBlocks={article?.content_blocks}
+            fallbackMarkdown={article?.content_markdown}
+          />
           {fieldError(state.errors, "contentMarkdown") ? (
             <span className="text-danger mt-2 block text-xs">
               {fieldError(state.errors, "contentMarkdown")}

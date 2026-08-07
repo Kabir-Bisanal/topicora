@@ -9,6 +9,11 @@ The repository includes five substantial demo articles, a repeatable database se
 - Editorial homepage with a single featured story, latest articles, category navigation, topic chips, newsletter capture, dark mode, and responsive layouts.
 - Article archive, category and tag pages, PostgreSQL full-text search, pagination, rich Markdown articles, table of contents, reading progress, disclosures, share links, related stories, and print styles.
 - Protected admin dashboard for articles, categories, tags, subscribers, messages, redirects, and site settings.
+- Staff invitations, role management, mandatory TOTP MFA for invited users, and an immutable administrative audit trail.
+- A movable block composer backed by portable Markdown and automatic, restorable article revisions.
+- Durable scheduled-publication and campaign queues processed by authenticated Vercel Cron workers.
+- Newsletter topic/frequency preferences, one-click unsubscribe, segmented campaigns, delivery retries, and per-recipient delivery records.
+- Optional Sentry client/server/edge monitoring with privacy filtering, plus request guardrails designed to complement Vercel WAF.
 - Draft, scheduled, published, and archived editorial workflows. Preview URLs are signed and expire after 15 minutes.
 - Supabase Auth, Postgres, Row Level Security, and Storage with strict media policies.
 - Double opt-in newsletter flow, validated contact form, anti-bot controls, database-backed rate limiting, and optional Resend delivery.
@@ -51,21 +56,27 @@ The seed is safe to replay through `pnpm db:reset`. It creates the initial taxon
 
 ## Environment variables
 
-| Variable                               | Scope       | Required          | Purpose                                                                                 |
-| -------------------------------------- | ----------- | ----------------- | --------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_NAME`                | Public      | No                | Display and metadata name; defaults to Topicora.                                        |
-| `NEXT_PUBLIC_SITE_TAGLINE`             | Public      | No                | Brand tagline.                                                                          |
-| `NEXT_PUBLIC_SITE_URL`                 | Public      | Yes in production | Absolute canonical origin, without a trailing slash.                                    |
-| `NEXT_PUBLIC_SUPABASE_URL`             | Public      | Yes               | Supabase project API URL.                                                               |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`        | Public      | Yes               | Browser-safe Supabase publishable/anon key.                                             |
-| `SUPABASE_SERVICE_ROLE_KEY`            | Server only | Yes               | Admin operations, form writes, previews, and rate limiting. Never expose it to clients. |
-| `RESEND_API_KEY`                       | Server only | Production email  | Sends confirmation and contact email.                                                   |
-| `EMAIL_FROM`                           | Server only | Production email  | Verified sender identity.                                                               |
-| `CONTACT_TO_EMAIL`                     | Server only | Contact delivery  | Destination for contact notifications.                                                  |
-| `NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED` | Public      | No                | Set to `true` to load Vercel Analytics.                                                 |
-| `ADMIN_EMAIL`                          | Script/CI   | Bootstrap only    | First administrator account.                                                            |
-| `ADMIN_PASSWORD`                       | Script/CI   | Bootstrap only    | First administrator password, 12+ characters.                                           |
-| `ADMIN_DISPLAY_NAME`                   | Script      | No                | Initial profile display name.                                                           |
+| Variable                                | Scope       | Required           | Purpose                                                                                 |
+| --------------------------------------- | ----------- | ------------------ | --------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_NAME`                 | Public      | No                 | Display and metadata name; defaults to Topicora.                                        |
+| `NEXT_PUBLIC_SITE_TAGLINE`              | Public      | No                 | Brand tagline.                                                                          |
+| `NEXT_PUBLIC_SITE_URL`                  | Public      | Yes in production  | Absolute canonical origin, without a trailing slash.                                    |
+| `NEXT_PUBLIC_SUPABASE_URL`              | Public      | Yes                | Supabase project API URL.                                                               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`         | Public      | Yes                | Browser-safe Supabase publishable/anon key.                                             |
+| `SUPABASE_SERVICE_ROLE_KEY`             | Server only | Yes                | Admin operations, form writes, previews, and rate limiting. Never expose it to clients. |
+| `RESEND_API_KEY`                        | Server only | Production email   | Sends confirmation and contact email.                                                   |
+| `EMAIL_FROM`                            | Server only | Production email   | Verified sender identity.                                                               |
+| `CONTACT_TO_EMAIL`                      | Server only | Contact delivery   | Destination for contact notifications.                                                  |
+| `NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED`  | Public      | No                 | Set to `true` to load Vercel Analytics.                                                 |
+| `NEXT_PUBLIC_SENTRY_DSN`                | Public      | Monitoring         | Browser-safe Sentry ingest DSN.                                                         |
+| `SENTRY_DSN`                            | Server only | Monitoring         | Server and worker Sentry ingest DSN.                                                    |
+| `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE` | Public      | No                 | Trace sample from `0` to `1`; defaults to `0.1`.                                        |
+| `SENTRY_AUTH_TOKEN`                     | Build only  | Source maps        | Sentry release and source-map upload token.                                             |
+| `SENTRY_ORG` / `SENTRY_PROJECT`         | Build only  | Source maps        | Sentry organization and project slugs.                                                  |
+| `CRON_SECRET`                           | Server only | Production workers | 32+ character bearer secret for publication and campaign workers.                       |
+| `ADMIN_EMAIL`                           | Script/CI   | Bootstrap only     | First administrator account.                                                            |
+| `ADMIN_PASSWORD`                        | Script/CI   | Bootstrap only     | First administrator password, 12+ characters.                                           |
+| `ADMIN_DISPLAY_NAME`                    | Script      | No                 | Initial profile display name.                                                           |
 
 `SUPABASE_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` support CLI/CI workflows but are not consumed by the application runtime.
 
@@ -95,7 +106,16 @@ pnpm create-admin    Create the first administrator from environment values
 4. Set a future publish time for scheduled release, or publish immediately.
 5. Only published articles whose `published_at` is in the past appear publicly. The application invalidates affected pages after editorial changes.
 
-Markdown is sanitized before rendering. Cover images require alt text. Article validation enforces title, excerpt, SEO, canonical, publication, and disclosure constraints.
+The editor stores ordered content blocks and derives sanitized Markdown for public rendering, RSS, search, and portability. Every save creates a database revision; older snapshots can be restored without deleting later history. Cover images require alt text. Article validation enforces title, excerpt, SEO, canonical, publication, and disclosure constraints.
+
+## Security and operations
+
+- Existing administrators can enable MFA at `/admin/security`; newly invited staff must enroll before protected data is available.
+- Administrators manage roles and invitations at `/admin/team` and review append-only events at `/admin/audit`.
+- `/admin/schedule` shows durable publication jobs. `/admin/campaigns` manages newsletter drafts, segments, schedules, and sending.
+- Vercel calls `/api/cron/publish` and `/api/cron/campaigns` every minute using `CRON_SECRET`. PostgreSQL controls article visibility at the exact timestamp; the publication worker refreshes caches during the next worker window.
+- Sentry remains disabled until its DSN is supplied. Request bodies, cookies, email addresses, and IP addresses are removed from captured server events.
+- Application request checks and PostgreSQL rate limits remain active even when Vercel WAF is not configured.
 
 ## Project layout
 

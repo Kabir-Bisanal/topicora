@@ -14,5 +14,6 @@ describe("environment validation", () => {
       parsePublicEnv({ NEXT_PUBLIC_SITE_URL: "not-a-url" }),
     ).toThrow();
     expect(() => parseServerEnv({ ADMIN_PASSWORD: "short" })).toThrow();
+    expect(() => parseServerEnv({ CRON_SECRET: "short" })).toThrow();
   });
 });

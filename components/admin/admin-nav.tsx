@@ -1,9 +1,13 @@
 import {
+  CalendarClock,
   FileText,
   FolderTree,
   Gauge,
   Inbox,
+  Mail,
+  KeyRound,
   LogOut,
+  ScrollText,
   Settings,
   Tags,
   Users,
@@ -16,10 +20,14 @@ import { logoutAction } from "@/lib/actions/auth";
 const links = [
   ["Dashboard", "/admin", Gauge],
   ["Articles", "/admin/articles", FileText],
+  ["Schedule", "/admin/schedule", CalendarClock],
   ["Categories", "/admin/categories", FolderTree],
   ["Tags", "/admin/tags", Tags],
   ["Messages", "/admin/messages", Inbox],
   ["Subscribers", "/admin/subscribers", Users],
+  ["Campaigns", "/admin/campaigns", Mail],
+  ["Team", "/admin/team", KeyRound],
+  ["Audit trail", "/admin/audit", ScrollText],
   ["Settings", "/admin/settings", Settings],
 ] as const;
 

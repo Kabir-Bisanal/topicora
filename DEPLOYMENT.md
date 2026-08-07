@@ -68,9 +68,16 @@ RESEND_API_KEY=<server-only-key>
 EMAIL_FROM=Topicora <hello@your-domain.example>
 CONTACT_TO_EMAIL=editor@your-domain.example
 NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED=true
+NEXT_PUBLIC_SENTRY_DSN=<public-sentry-dsn>
+SENTRY_DSN=<server-sentry-dsn>
+NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+SENTRY_AUTH_TOKEN=<server-only-token>
+SENTRY_ORG=<sentry-organization-slug>
+SENTRY_PROJECT=<sentry-project-slug>
+CRON_SECRET=<at-least-32-random-characters>
 ```
 
-Set the service-role and Resend keys as sensitive. Do not expose either with a `NEXT_PUBLIC_` prefix. Set `NEXT_PUBLIC_SITE_URL` separately for staging if staging is indexed behind a dedicated hostname; keep preview deployments blocked from search indexing at the platform level.
+Set the service-role, Resend, Sentry auth token, and cron secret as sensitive. Do not expose them with a `NEXT_PUBLIC_` prefix. `NEXT_PUBLIC_SENTRY_DSN` is intentionally browser-visible. Set `NEXT_PUBLIC_SITE_URL` separately for staging if staging is indexed behind a dedicated hostname; keep preview deployments blocked from search indexing at the platform level.
 
 Vercel build settings:
 
@@ -92,6 +99,19 @@ Deploy the main branch through Vercel. Add the production domain, configure DNS 
 
 Redeploy after changing a build-time public environment value.
 
+`vercel.json` schedules the publication and newsletter campaign workers every minute. Vercel sends `Authorization: Bearer <CRON_SECRET>` when the project has `CRON_SECRET` configured; both routes reject missing or invalid credentials. Confirm both jobs appear under Project Settings -> Cron Jobs after deployment.
+
+## 5a. Configure monitoring and edge protection
+
+Create a Sentry Next.js project and provide the variables above. Use a token scoped only to source-map release uploads. Trigger a controlled server error in staging, confirm it reaches Sentry without cookies, form bodies, email addresses, or IP addresses, and then remove the test error.
+
+The application proxy already rejects oversized, cross-site, and method-mismatched public mutations. Add platform rules in Vercel Firewall for volumetric protection:
+
+- Rate-limit newsletter, contact, auth callback, staff invitation, and admin mutation paths.
+- Enable bot protection or managed challenges for repeated abusive POST requests.
+- Start custom rules in log-only mode, review legitimate traffic, and then switch them to deny or challenge.
+- Exclude authenticated cron requests from broad bot rules while retaining the bearer-secret check.
+
 ## 6. Production smoke test
 
 Before announcing launch, verify:
@@ -101,9 +121,15 @@ Before announcing launch, verify:
 - An unauthenticated `/admin` request redirects to login.
 - An administrator can create, preview, schedule, publish, edit, archive, and—if intended—delete a test article.
 - The scheduled article remains hidden before its timestamp and appears afterward.
+- An administrator can invite an editor; the invitation grants only the selected role and requires TOTP before protected work.
+- Article edits create immutable revision snapshots, and restoring a revision creates a new snapshot instead of erasing history.
+- The publication worker processes a due job and invalidates the related article and archive caches.
 - Cover uploads reject disallowed type/size and require alt text.
 - Newsletter signup remains pending until the confirmation link is used.
+- A subscriber can update topics/frequency and unsubscribe through a signed preference link; one-click unsubscribe accepts POST.
+- A test campaign can be drafted, segmented, scheduled, delivered once, and retried safely after a simulated failure.
 - Contact submission is stored and delivered to the configured address.
+- A controlled staging error appears in Sentry without sensitive request data, and Vercel Firewall rules challenge abusive traffic without blocking normal forms or cron jobs.
 - Privacy, terms, disclaimer, editorial, corrections, and AI policy pages contain owner-approved legal/editorial text.
 - Security headers appear on production responses and no secret appears in browser JavaScript or logs.
 

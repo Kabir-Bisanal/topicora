@@ -17,6 +17,10 @@ flowchart LR
   Actions --> Storage["Supabase Storage"]
   Actions --> Email["Resend"]
   Edge --> Analytics["Vercel Analytics, optional"]
+  Edge --> Sentry["Sentry, optional"]
+  Cron["Vercel Cron"] --> Workers["Authenticated queue workers"]
+  Workers --> DB
+  Workers --> Email
 ```
 
 The service-role credential is imported only by server-only modules. Public reads use the anon key and are constrained by Row Level Security. Privileged actions first verify the authenticated profile and role, then use the minimum suitable client.
@@ -116,6 +120,10 @@ Article visibility is defined by both status and time: `status = published` and 
 
 Preview requests require an authenticated administrator/editor. `/api/preview` creates an HMAC-SHA256 token containing the article ID and an expiry 15 minutes in the future. `/preview/[id]` verifies the signature with a timing-safe comparison and renders with `noindex`. The token secret is derived from the service-role key and never reaches a client bundle.
 
+Each article mutation also creates an `article_revisions` snapshot. The block composer stores structured JSON and derives canonical Markdown; revision restoration updates only an allowlist of editorial fields and itself creates another revision.
+
+Future publication changes synchronize a unique `publication_jobs` row. The public RLS predicate makes the story visible at the exact database timestamp, independent of the worker. An authenticated minute worker atomically claims due rows with `FOR UPDATE SKIP LOCKED`, revalidates affected Next.js routes, records completion, and retries stale or failed claims.
+
 ## Search
 
 An article trigger maintains a weighted PostgreSQL `tsvector` from title, excerpt, and Markdown content. Public search validates and bounds the query, uses `websearch_to_tsquery`, orders by rank and recency, and only returns currently published rows under RLS. Search terms are highlighted at rendering time without injecting HTML.
@@ -125,6 +133,20 @@ An article trigger maintains a weighted PostgreSQL `tsvector` from title, excerp
 Public contact and newsletter endpoints use Zod validation, same-origin checks, hidden honeypot fields, minimum completion time, and database-backed IP/user-agent rate limiting. Contact messages are stored before optional delivery so an email outage does not lose the submission.
 
 Newsletter subscribers begin as `pending`. A random confirmation token is emailed while only its SHA-256 hash is stored. The confirmation endpoint activates the record once; repeated confirmation remains safe. In local development, Supabase's mail viewer handles auth mail, and contact delivery can be omitted.
+
+Confirmed subscribers receive an HMAC-signed preference link. They can select topic slugs and weekly/monthly frequency or unsubscribe. Campaigns target those preferences, create unique delivery records, retry transient failures up to three times, and include one-click unsubscribe headers. The campaign worker never sends to a subscriber who is no longer active at delivery time.
+
+## Staff security and governance
+
+Staff invitations are created only with Supabase's trusted Auth Admin API. A database invitation record assigns the invited role and marks MFA as required when Auth creates the profile. TOTP enrollment and challenge use Supabase Auth assurance levels. Application checks redirect incomplete sessions to the security flow, while restrictive RLS policies deny protected table operations when a required account lacks `aal2`.
+
+`audit_logs` stores actor, action, entity reference, minimal metadata, and time. Database triggers cover editorial, settings, audience, campaign, and team changes; explicit server events cover security and workers. A mutation-prevention trigger makes rows append-only.
+
+## Observability and edge controls
+
+Next.js instrumentation initializes Sentry separately for client, Node.js, and edge contexts only when a DSN exists. Global and route errors are captured, source maps can be uploaded during production builds, and event filters remove request bodies, cookies, email, and IP fields.
+
+`proxy.ts` performs constant-cost method, cross-site, and payload-size checks for public mutation endpoints before route execution, adds request correlation IDs, and then refreshes auth. Route-level validation and the durable database limiter remain separate layers. Vercel WAF supplies platform DDoS, managed-bot, challenge, and IP rate-limit controls in production.
 
 ## Content and media safety
 

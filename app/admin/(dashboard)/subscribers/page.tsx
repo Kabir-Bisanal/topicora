@@ -20,6 +20,7 @@ export default async function SubscribersPage() {
               <th className="p-4">Email</th>
               <th className="p-4">Source</th>
               <th className="p-4">Subscribed</th>
+              <th className="p-4">Preferences</th>
               <th className="p-4">Status</th>
             </tr>
           </thead>
@@ -29,6 +30,15 @@ export default async function SubscribersPage() {
                 <td className="p-4 font-bold">{item.email}</td>
                 <td className="p-4">{item.source}</td>
                 <td className="p-4">{formatDate(item.subscribed_at)}</td>
+                <td className="p-4 text-xs">
+                  <span className="font-bold capitalize">{item.frequency}</span>
+                  <br />
+                  <span className="text-muted-foreground">
+                    {item.topic_slugs.length
+                      ? item.topic_slugs.join(", ")
+                      : "All topics"}
+                  </span>
+                </td>
                 <td className="p-4">
                   <form
                     action={updateSubscriberStatusAction}

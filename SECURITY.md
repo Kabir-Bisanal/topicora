@@ -17,9 +17,9 @@ Controls are layered across Next.js validation and authorization, Supabase Auth,
 
 ## Authentication and sessions
 
-Self-registration is disabled. Administrator accounts are created through the server-side bootstrap script, while subsequent users should be invited through Supabase Auth and assigned roles by a trusted database administrator. Session cookies are issued and refreshed by Supabase's SSR integration. Admin layouts independently load the session profile and reject unauthorized roles.
+Self-registration is disabled. Administrator accounts are created through the server-side bootstrap script, while subsequent users are invited from `/admin/team` through Supabase's server-only Auth Admin API. Session cookies are issued and refreshed by Supabase's SSR integration. Admin data access functions and Server Actions independently load the session profile and reject unauthorized roles.
 
-Require strong unique passwords and enable MFA in Supabase before expanding the editorial team. Review active users and revoke departed staff promptly. Do not share a common editor account.
+Invited accounts are marked `mfa_required` and must enroll a TOTP authenticator. Sessions are checked for Supabase `aal2`; restrictive database policies deny protected operations when a required user remains at `aal1`. Existing bootstrap administrators should enable MFA at `/admin/security`. Review active users and revoke departed staff promptly. Do not share a common editor account.
 
 ## Row Level Security
 
@@ -32,6 +32,8 @@ The `private` schema and rate-limit table are revoked from `anon` and `authentic
 The newsletter and contact APIs require a valid same-origin `Origin`, validate payloads with bounded Zod schemas, reject populated honeypots, require a plausible completion time, and apply a database-backed fingerprint limit. Newsletter confirmation stores a token hash rather than the bearer token.
 
 These controls reduce commodity abuse but are not a complete DDoS defense. For a high-traffic launch, add Vercel Firewall or Cloudflare Turnstile, monitor rejection rates, and configure spend/rate alerts for Resend and Supabase.
+
+Production Vercel projects should enable the bot managed ruleset and rate-limit `/api/contact`, `/api/newsletter`, `/admin/login`, sensitive Server Actions, and cron routes. The repository's proxy rejects oversized or cross-site public mutations before route execution, but platform WAF remains the correct control for traffic floods.
 
 Avoid returning account-existence detail in newsletter responses. Contact data should have a documented retention period; delete resolved messages and inactive subscriber records when no longer required.
 
@@ -63,7 +65,7 @@ Keep `NEXT_PUBLIC_SITE_URL` exact. Same-origin checks recognize the request host
 
 ## Monitoring and incident response
 
-Connect Vercel logs and Supabase logs to alerting, and consider Sentry before launch. Avoid logging contact bodies, subscriber emails, auth tokens, or request cookies. Record administrative changes through an audit table before allowing a larger editorial team.
+Configure Sentry before launch and connect Vercel/Supabase logs to alerting. Sentry initialization is disabled without a DSN and strips request bodies, cookies, user email, and IP values. Avoid logging contact bodies, subscriber emails, auth tokens, MFA secrets, or request cookies. Administrative events are written to an append-only audit table that intentionally excludes row snapshots and audience/contact PII.
 
 For an incident:
 

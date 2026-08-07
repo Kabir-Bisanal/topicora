@@ -21,6 +21,16 @@ A standard article should contain:
 4. Caveats, counterevidence, or limitations where relevant.
 5. A concise conclusion and source links.
 
+## Block editor and revisions
+
+Build stories from paragraph, heading, quotation, callout, list, code, divider, or Markdown blocks. Keep one idea per block and use section headings to expose the argument's structure. The CMS derives Markdown from blocks, so do not rely on visual spacing alone to communicate meaning.
+
+Saving creates a restorable revision. Use revision restoration for accidental or editorial changes, not as a substitute for a visible correction note after publication. Restoring a revision creates a new current revision; it does not erase intervening history.
+
+## Newsletter campaigns
+
+Campaign subject lines must accurately represent the message. Select topic and frequency segments only when the entire message suits that audience. Preview links, headings, disclosure language, and calls to action before scheduling. Never import an address without documented consent, reactivate an unsubscribed address manually, or remove the preference/unsubscribe footer.
+
 ## Research and sourcing
 
 Prefer primary sources: original research, official datasets, standards, filings, court records, direct transcripts, and product documentation. Use reputable secondary sources for context, not as a substitute for a checkable original claim. Link to the most direct stable source and record access dates when content is likely to change.
@@ -82,3 +92,4 @@ Fix minor spelling or formatting issues directly. For material factual changes, 
 - [ ] The preview was checked on mobile and desktop, including dark mode.
 - [ ] Publication time and featured status are intentional.
 - [ ] A second person reviewed material or high-risk work.
+- [ ] If this is a campaign, its segment, delivery time, preference link, and unsubscribe behavior are correct.

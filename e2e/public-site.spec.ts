@@ -114,3 +114,12 @@ test("newsletter and contact endpoints reject invalid input", async ({
   });
   expect(statuses).toEqual([400, 400]);
 });
+
+test("invalid newsletter preference links fail safely", async ({ page }) => {
+  await page.goto("/newsletter/preferences?token=invalid");
+  await expect(
+    page.getByRole("heading", {
+      name: "This preference link is unavailable",
+    }),
+  ).toBeVisible();
+});

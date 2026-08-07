@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { PolicyPage } from "@/components/layout/policy-page";
+
+export const metadata: Metadata = { title: "About", description: "Topicora is an India-first English publication making useful ideas understandable and practical.", alternates: { canonical: "/about" } };
+
+export default function AboutPage() {
+  return <PolicyPage eyebrow="About Topicora" title="Curiosity with somewhere to go." intro="Topicora is a general-interest publication for students and early-career professionals in India—and for anyone who prefers a clear explanation to a noisy take."><h2>What we publish</h2><p>We cover technology and AI, money and work, culture and media, everyday life, and practical guides. The range is intentionally broad. The common thread is usefulness: each article should help a reader understand an idea, make a better decision, or ask a sharper next question.</p><h2>How we work</h2><p>We favour primary sources, visible uncertainty, plain English, and enough context to make a claim meaningful. We avoid fabricated quotations, false precision, and headlines that promise more than the article can support. Disclosures appear near the start whenever a piece is opinion, financial, sponsored, affiliate-supported, or AI-assisted.</p><h2>Who it is for</h2><p>Topicora begins with an India-first perspective without assuming every reader lives in India. We explain local institutions and examples so international readers can follow, and we avoid treating one city, profession, or income level as universal.</p><h2>A living publication</h2><p>Responsible publishing includes correction. If a material fact changes or an article is wrong, we update it transparently. Read our <Link href="/editorial-policy">editorial policy</Link>, <Link href="/corrections-policy">corrections policy</Link>, and <Link href="/ai-assistance-policy">AI-assistance policy</Link>, or <Link href="/contact">contact the editorial desk</Link>.</p></PolicyPage>;
+}

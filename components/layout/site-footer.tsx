@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
+import { NewsletterForm } from "@/components/forms/newsletter-form";
 
 const policyLinks = [
   ["Privacy", "/privacy"],
@@ -9,12 +10,13 @@ const policyLinks = [
   ["Disclaimer", "/disclaimer"],
   ["Editorial policy", "/editorial-policy"],
   ["Corrections", "/corrections-policy"],
+  ["AI assistance", "/ai-assistance-policy"],
 ];
 
 export function SiteFooter() {
   return (
     <footer className="no-print mt-24 border-t border-border bg-surface py-12">
-      <Container className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+      <Container className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1.2fr]">
         <div>
           <Image src="/logo.svg" alt="Topicora" width={160} height={36} className="h-8 w-auto dark:invert" />
           <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
@@ -36,6 +38,11 @@ export function SiteFooter() {
             {policyLinks.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
           </div>
         </nav>
+        <div>
+          <p className="eyebrow mb-3">A thoughtful inbox</p>
+          <p className="mb-4 text-sm leading-6 text-muted-foreground">Occasional new articles and practical reading notes. No daily noise.</p>
+          <NewsletterForm />
+        </div>
       </Container>
       <Container className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
         © {new Date().getFullYear()} Topicora. Built for careful curiosity.

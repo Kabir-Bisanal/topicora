@@ -28,6 +28,7 @@
 Thumbs.db
 *.pem
 *.log
+/data/*.jsonl
 
 # TypeScript
 *.tsbuildinfo

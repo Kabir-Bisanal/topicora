@@ -8,7 +8,5 @@ export function getServerEnv() {
 
 export function hasServiceRoleEnv() {
   const env = getServerEnv();
-  return Boolean(
-    env.NEXT_PUBLIC_SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY,
-  );
+  return Boolean(env.NEXT_PUBLIC_SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY);
 }

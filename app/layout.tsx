@@ -53,8 +53,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${sans.variable} ${serif.variable} min-h-full antialiased`}>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <body
+        className={`${sans.variable} ${serif.variable} min-h-full antialiased`}
+      >
         <ThemeProvider>
           {children}
           <JsonLd
@@ -79,7 +81,9 @@ export default function RootLayout({
               },
             ]}
           />
-          {publicEnv.NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED ? <Analytics /> : null}
+          {publicEnv.NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED ? (
+            <Analytics />
+          ) : null}
         </ThemeProvider>
       </body>
     </html>

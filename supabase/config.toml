@@ -37,7 +37,9 @@ jwt_expiry = 3600
 enable_signup = false
 
 [auth.email]
-enable_signup = false
+# The email provider must stay enabled for invited/admin-created users to sign in.
+# Global auth.enable_signup=false above still prevents self-service registration.
+enable_signup = true
 double_confirm_changes = true
 enable_confirmations = true
 

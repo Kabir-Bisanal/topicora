@@ -31,10 +31,14 @@ export const serverEnvSchema = publicEnvSchema.extend({
 export type PublicEnv = z.infer<typeof publicEnvSchema>;
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
-export function parsePublicEnv(source: Record<string, string | undefined>): PublicEnv {
+export function parsePublicEnv(
+  source: Record<string, string | undefined>,
+): PublicEnv {
   return publicEnvSchema.parse(source);
 }
 
-export function parseServerEnv(source: Record<string, string | undefined>): ServerEnv {
+export function parseServerEnv(
+  source: Record<string, string | undefined>,
+): ServerEnv {
   return serverEnvSchema.parse(source);
 }

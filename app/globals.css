@@ -148,7 +148,10 @@ select {
   padding: 0.65rem 1rem;
   font-size: 0.875rem;
   font-weight: 750;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
 }
 
 .button-primary {

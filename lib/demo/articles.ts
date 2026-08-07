@@ -1,12 +1,7 @@
 import { calculateReadingTime } from "@/lib/article/reading-time";
 
 export type DisclosureType =
-  | "none"
-  | "opinion"
-  | "financial"
-  | "affiliate"
-  | "sponsored"
-  | "ai_assisted";
+  "none" | "opinion" | "financial" | "affiliate" | "sponsored" | "ai_assisted";
 
 export type DemoCategory = {
   id: string;
@@ -53,59 +48,82 @@ export const demoCategories: DemoCategory[] = [
     id: "20000000-0000-4000-8000-000000000001",
     name: "Technology & AI",
     slug: "technology-ai",
-    description: "Clear explanations of the tools and systems shaping digital life.",
+    description:
+      "Clear explanations of the tools and systems shaping digital life.",
     sortOrder: 1,
   },
   {
     id: "20000000-0000-4000-8000-000000000002",
     name: "Money & Work",
     slug: "money-work",
-    description: "Practical frameworks for work, money, and better professional decisions.",
+    description:
+      "Practical frameworks for work, money, and better professional decisions.",
     sortOrder: 2,
   },
   {
     id: "20000000-0000-4000-8000-000000000003",
     name: "Culture & Media",
     slug: "culture-media",
-    description: "How media, platforms, and culture influence what we notice and value.",
+    description:
+      "How media, platforms, and culture influence what we notice and value.",
     sortOrder: 3,
   },
   {
     id: "20000000-0000-4000-8000-000000000004",
     name: "Everyday Life",
     slug: "everyday-life",
-    description: "Thoughtful approaches to habits, attention, and ordinary choices.",
+    description:
+      "Thoughtful approaches to habits, attention, and ordinary choices.",
     sortOrder: 4,
   },
   {
     id: "20000000-0000-4000-8000-000000000005",
     name: "Practical Guides",
     slug: "practical-guides",
-    description: "Repeatable, useful methods for navigating information and daily tasks.",
+    description:
+      "Repeatable, useful methods for navigating information and daily tasks.",
     sortOrder: 5,
   },
 ];
 
 export const demoTags: DemoTag[] = [
-  ["30000000-0000-4000-8000-000000000001", "artificial intelligence", "artificial-intelligence"],
+  [
+    "30000000-0000-4000-8000-000000000001",
+    "artificial intelligence",
+    "artificial-intelligence",
+  ],
   ["30000000-0000-4000-8000-000000000002", "search", "search"],
-  ["30000000-0000-4000-8000-000000000003", "digital literacy", "digital-literacy"],
+  [
+    "30000000-0000-4000-8000-000000000003",
+    "digital literacy",
+    "digital-literacy",
+  ],
   ["30000000-0000-4000-8000-000000000004", "investing", "investing"],
-  ["30000000-0000-4000-8000-000000000005", "financial literacy", "financial-literacy"],
+  [
+    "30000000-0000-4000-8000-000000000005",
+    "financial literacy",
+    "financial-literacy",
+  ],
   ["30000000-0000-4000-8000-000000000006", "business", "business"],
   ["30000000-0000-4000-8000-000000000007", "social media", "social-media"],
   ["30000000-0000-4000-8000-000000000008", "attention", "attention"],
   ["30000000-0000-4000-8000-000000000009", "online culture", "online-culture"],
   ["30000000-0000-4000-8000-000000000010", "productivity", "productivity"],
   ["30000000-0000-4000-8000-000000000011", "habits", "habits"],
-  ["30000000-0000-4000-8000-000000000012", "decision making", "decision-making"],
+  [
+    "30000000-0000-4000-8000-000000000012",
+    "decision making",
+    "decision-making",
+  ],
   ["30000000-0000-4000-8000-000000000013", "fact checking", "fact-checking"],
   ["30000000-0000-4000-8000-000000000014", "media literacy", "media-literacy"],
   ["30000000-0000-4000-8000-000000000015", "research", "research"],
 ].map(([id, name, slug]) => ({ id, name, slug }));
 
-const category = (slug: string) => demoCategories.find((item) => item.slug === slug)!;
-const tags = (...slugs: string[]) => demoTags.filter((tag) => slugs.includes(tag.slug));
+const category = (slug: string) =>
+  demoCategories.find((item) => item.slug === slug)!;
+const tags = (...slugs: string[]) =>
+  demoTags.filter((tag) => slugs.includes(tag.slug));
 
 const aiSearch = `AI assistants are changing a familiar internet ritual. Instead of translating a question into a few keywords, opening several tabs, and assembling an answer, a person can describe what they need in ordinary language. The assistant may return an explanation, comparison, or plan in seconds. That convenience is real, but the interface also changes what users can see about how an answer was formed.
 
@@ -314,7 +332,8 @@ export const demoArticles: DemoArticle[] = [
     coverImageUrl: "/demo/ai-search.svg",
     coverImageAlt:
       "Abstract illustration of a search box transforming into a conversational interface",
-    coverImageCaption: "A conversational answer can shorten the path from question to context.",
+    coverImageCaption:
+      "A conversational answer can shorten the path from question to context.",
     disclosure: "ai_assisted",
     disclosureNote:
       "AI tools assisted with structural review; the article was written, checked, and approved by the Topicora editorial desk.",
@@ -328,7 +347,8 @@ export const demoArticles: DemoArticle[] = [
   makeArticle({
     id: "40000000-0000-4000-8000-000000000002",
     authorId: demoAuthor.id,
-    title: "A Beginner’s Framework for Evaluating a Stock Without Predicting the Future",
+    title:
+      "A Beginner’s Framework for Evaluating a Stock Without Predicting the Future",
     slug: "beginner-framework-for-evaluating-a-stock",
     category: category("money-work"),
     tags: tags("investing", "financial-literacy", "business"),
@@ -338,7 +358,8 @@ export const demoArticles: DemoArticle[] = [
     coverImageUrl: "/demo/stock-framework.svg",
     coverImageAlt:
       "Notebook showing a simple business-analysis checklist beside a financial chart",
-    coverImageCaption: "A useful stock review starts with the business, not a price forecast.",
+    coverImageCaption:
+      "A useful stock review starts with the business, not a price forecast.",
     disclosure: "financial",
     disclosureNote: "General educational content only; not investment advice.",
     isFeatured: false,
@@ -359,8 +380,10 @@ export const demoArticles: DemoArticle[] = [
       "Short-video feeds combine low effort, rapid novelty, and uncertain rewards. Understanding the design can help users regain intentional control.",
     contentMarkdown: shortVideos,
     coverImageUrl: "/demo/short-videos.svg",
-    coverImageAlt: "Smartphone displaying a sequence of abstract short-video cards",
-    coverImageCaption: "An endless feed removes the natural boundaries that usually invite a pause.",
+    coverImageAlt:
+      "Smartphone displaying a sequence of abstract short-video cards",
+    coverImageCaption:
+      "An endless feed removes the natural boundaries that usually invite a pause.",
     disclosure: "none",
     disclosureNote: null,
     isFeatured: false,
@@ -382,9 +405,11 @@ export const demoArticles: DemoArticle[] = [
     contentMarkdown: twoMinuteRule,
     coverImageUrl: "/demo/two-minute-rule.svg",
     coverImageAlt: "Two-minute timer beside a short handwritten task list",
-    coverImageCaption: "A quick-task rule works best when it respects the context of focused work.",
+    coverImageCaption:
+      "A quick-task rule works best when it respects the context of focused work.",
     disclosure: "opinion",
-    disclosureNote: "This article presents an editorial interpretation of a productivity technique.",
+    disclosureNote:
+      "This article presents an editorial interpretation of a productivity technique.",
     isFeatured: false,
     publishedAt: "2026-07-23T04:30:00.000Z",
     updatedAt: "2026-07-23T04:30:00.000Z",
@@ -404,7 +429,8 @@ export const demoArticles: DemoArticle[] = [
     contentMarkdown: verifyViralClaim,
     coverImageUrl: "/demo/verify-claim.svg",
     coverImageAlt: "Magnifying glass inspecting a social-media post",
-    coverImageCaption: "Verification starts by separating the evidence from the caption around it.",
+    coverImageCaption:
+      "Verification starts by separating the evidence from the caption around it.",
     disclosure: "none",
     disclosureNote: null,
     isFeatured: false,

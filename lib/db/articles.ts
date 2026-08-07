@@ -12,6 +12,7 @@ import {
   type DemoTag,
 } from "@/lib/demo/articles";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeSearchQuery } from "@/lib/validation/search";
 
 export type PublicArticle = DemoArticle & {
   author: typeof demoAuthor;
@@ -110,8 +111,12 @@ function mapArticle(row: ArticleRow): PublicArticle {
 function filterDemo(categorySlug?: string, tagSlug?: string) {
   return demoArticles
     .map(asPublicArticle)
-    .filter((article) => !categorySlug || article.category.slug === categorySlug)
-    .filter((article) => !tagSlug || article.tags.some((tag) => tag.slug === tagSlug))
+    .filter(
+      (article) => !categorySlug || article.category.slug === categorySlug,
+    )
+    .filter(
+      (article) => !tagSlug || article.tags.some((tag) => tag.slug === tagSlug),
+    )
     .sort(
       (a, b) =>
         new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
@@ -128,12 +133,14 @@ const articleSelect = `
   article_tags(tag:tags(id,name,slug))
 `;
 
-export async function getPublishedArticles(options: {
-  page?: number;
-  pageSize?: number;
-  categorySlug?: string;
-  tagSlug?: string;
-} = {}): Promise<ArticleList> {
+export async function getPublishedArticles(
+  options: {
+    page?: number;
+    pageSize?: number;
+    categorySlug?: string;
+    tagSlug?: string;
+  } = {},
+): Promise<ArticleList> {
   const page = Math.max(1, options.page ?? 1);
   const pageSize = Math.min(50, Math.max(1, options.pageSize ?? 12));
   const fallback = filterDemo(options.categorySlug, options.tagSlug);
@@ -238,7 +245,10 @@ export async function getAllCategories(): Promise<DemoCategory[]> {
 export async function getAllTags(): Promise<DemoTag[]> {
   const supabase = await createClient();
   if (!supabase) return demoTags;
-  const { data } = await supabase.from("tags").select("id,name,slug").order("name");
+  const { data } = await supabase
+    .from("tags")
+    .select("id,name,slug")
+    .order("name");
   return data?.length ? data : demoTags;
 }
 
@@ -255,8 +265,9 @@ export async function getRelatedArticles(article: PublicArticle) {
       article: candidate,
       score:
         (candidate.category.id === article.category.id ? 3 : 0) +
-        candidate.tags.filter((tag) => article.tags.some((item) => item.id === tag.id))
-          .length,
+        candidate.tags.filter((tag) =>
+          article.tags.some((item) => item.id === tag.id),
+        ).length,
     }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)
@@ -268,7 +279,8 @@ export async function getArticleNavigation(article: PublicArticle) {
   const index = articles.findIndex((candidate) => candidate.id === article.id);
   return {
     newer: index > 0 ? articles[index - 1] : null,
-    older: index >= 0 && index < articles.length - 1 ? articles[index + 1] : null,
+    older:
+      index >= 0 && index < articles.length - 1 ? articles[index + 1] : null,
   };
 }
 
@@ -276,8 +288,8 @@ export async function searchPublishedArticles(
   query: string,
   categorySlug?: string,
 ): Promise<SearchResult[]> {
-  const normalized = query.trim().slice(0, 120);
-  if (normalized.length < 2) return [];
+  const normalized = normalizeSearchQuery(query);
+  if (!normalized) return [];
   const supabase = await createClient();
 
   if (supabase) {
@@ -305,7 +317,8 @@ export async function searchPublishedArticles(
   const terms = normalized.toLowerCase().split(/\s+/).filter(Boolean);
   return filterDemo(categorySlug)
     .filter((article) => {
-      const haystack = `${article.title} ${article.excerpt} ${article.contentMarkdown}`.toLowerCase();
+      const haystack =
+        `${article.title} ${article.excerpt} ${article.contentMarkdown}`.toLowerCase();
       return terms.every((term) => haystack.includes(term));
     })
     .map((article) => ({

@@ -7,7 +7,9 @@ export function ScrollProgress() {
   useEffect(() => {
     const update = () => {
       const height = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(height > 0 ? Math.min(100, (window.scrollY / height) * 100) : 0);
+      setProgress(
+        height > 0 ? Math.min(100, (window.scrollY / height) * 100) : 0,
+      );
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
@@ -18,8 +20,11 @@ export function ScrollProgress() {
     };
   }, []);
   return (
-    <div className="no-print fixed inset-x-0 top-0 z-50 h-1 bg-transparent" aria-hidden="true">
-      <div className="h-full bg-accent" style={{ width: `${progress}%` }} />
+    <div
+      className="no-print fixed inset-x-0 top-0 z-50 h-1 bg-transparent"
+      aria-hidden="true"
+    >
+      <div className="bg-accent h-full" style={{ width: `${progress}%` }} />
     </div>
   );
 }

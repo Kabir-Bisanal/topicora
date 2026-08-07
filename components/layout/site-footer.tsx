@@ -15,12 +15,19 @@ const policyLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="no-print mt-24 border-t border-border bg-surface py-12">
+    <footer className="no-print border-border bg-surface mt-24 border-t py-12">
       <Container className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1.2fr]">
         <div>
-          <Image src="/logo.svg" alt="Topicora" width={160} height={36} className="h-8 w-auto dark:invert" />
-          <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
-            Useful ideas, wherever curiosity leads. An India-first English publication for thoughtful, practical reading.
+          <Image
+            src="/logo.svg"
+            alt="Topicora"
+            width={160}
+            height={36}
+            className="h-8 w-auto dark:invert"
+          />
+          <p className="text-muted-foreground mt-4 max-w-sm text-sm leading-6">
+            Useful ideas, wherever curiosity leads. An India-first English
+            publication for thoughtful, practical reading.
           </p>
         </div>
         <nav aria-label="Publication">
@@ -35,16 +42,22 @@ export function SiteFooter() {
         <nav aria-label="Policies">
           <p className="eyebrow mb-3">Trust</p>
           <div className="grid gap-2 text-sm">
-            {policyLinks.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
+            {policyLinks.map(([label, href]) => (
+              <Link href={href} key={href}>
+                {label}
+              </Link>
+            ))}
           </div>
         </nav>
         <div>
           <p className="eyebrow mb-3">A thoughtful inbox</p>
-          <p className="mb-4 text-sm leading-6 text-muted-foreground">Occasional new articles and practical reading notes. No daily noise.</p>
+          <p className="text-muted-foreground mb-4 text-sm leading-6">
+            Occasional new articles and practical reading notes. No daily noise.
+          </p>
           <NewsletterForm />
         </div>
       </Container>
-      <Container className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
+      <Container className="border-border text-muted-foreground mt-10 border-t pt-6 text-xs">
         © {new Date().getFullYear()} Topicora. Built for careful curiosity.
       </Container>
     </footer>

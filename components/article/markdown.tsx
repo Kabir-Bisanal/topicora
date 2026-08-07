@@ -21,7 +21,17 @@ export function Markdown({ content }: { content: string }) {
         components={{
           a: ({ href, children, ...props }) => {
             const external = href?.startsWith("http");
-            return <a href={href} {...props} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{children}</a>;
+            return (
+              <a
+                href={href}
+                {...props}
+                {...(external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+              >
+                {children}
+              </a>
+            );
           },
         }}
       >

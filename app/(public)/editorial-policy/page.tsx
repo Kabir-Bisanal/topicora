@@ -3,8 +3,64 @@ import Link from "next/link";
 
 import { PolicyPage } from "@/components/layout/policy-page";
 
-export const metadata: Metadata = { title: "Editorial Policy", description: "Topicora’s standards for sourcing, independence, disclosures, updates, and responsible publication.", alternates: { canonical: "/editorial-policy" } };
+export const metadata: Metadata = {
+  title: "Editorial Policy",
+  description:
+    "Topicora’s standards for sourcing, independence, disclosures, updates, and responsible publication.",
+  alternates: { canonical: "/editorial-policy" },
+};
 
 export default function EditorialPolicyPage() {
-  return <PolicyPage eyebrow="How we publish" title="Editorial Policy" intro="Topicora earns trust by showing its work, separating evidence from interpretation, and correcting the record when needed."><h2>Accuracy and sourcing</h2><p>Writers should trace consequential claims to primary sources where possible and use independent reporting for context. Sources must actually support the nearby statement. We identify uncertainty, dates, geography, and limitations when they affect meaning. We do not fabricate quotations, experiences, statistics, or consensus.</p><h2>Fairness and independence</h2><p>Articles should represent material disagreement accurately and avoid caricaturing people or positions. Editorial conclusions remain independent of commercial relationships. Sponsored or affiliate-supported work is labelled and is never disguised as ordinary editorial coverage.</p><h2>Voice and headlines</h2><p>We write in clear international English with an India-first awareness. Headlines should be specific, proportional, and supported by the article. We avoid false urgency, decontextualized numbers, and certainty the evidence cannot bear.</p><h2>Disclosures</h2><p>Topicora marks opinion, financial, affiliate, sponsored, and AI-assisted content near the beginning. Conflicts that could reasonably influence a reader’s interpretation should be described in plain language.</p><h2>AI assistance</h2><p>AI tools may help with outlining, language review, or production tasks under human supervision. They may not publish autonomously. A human remains responsible for sources, claims, originality, permissions, and the final decision to publish. See the full <Link href="/ai-assistance-policy">AI-Assistance Policy</Link>.</p><h2>Updates and corrections</h2><p>Routine clarity or formatting edits may occur without a correction note. Material factual changes receive a visible update or correction. The process is described in our <Link href="/corrections-policy">Corrections Policy</Link>.</p></PolicyPage>;
+  return (
+    <PolicyPage
+      eyebrow="How we publish"
+      title="Editorial Policy"
+      intro="Topicora earns trust by showing its work, separating evidence from interpretation, and correcting the record when needed."
+    >
+      <h2>Accuracy and sourcing</h2>
+      <p>
+        Writers should trace consequential claims to primary sources where
+        possible and use independent reporting for context. Sources must
+        actually support the nearby statement. We identify uncertainty, dates,
+        geography, and limitations when they affect meaning. We do not fabricate
+        quotations, experiences, statistics, or consensus.
+      </p>
+      <h2>Fairness and independence</h2>
+      <p>
+        Articles should represent material disagreement accurately and avoid
+        caricaturing people or positions. Editorial conclusions remain
+        independent of commercial relationships. Sponsored or
+        affiliate-supported work is labelled and is never disguised as ordinary
+        editorial coverage.
+      </p>
+      <h2>Voice and headlines</h2>
+      <p>
+        We write in clear international English with an India-first awareness.
+        Headlines should be specific, proportional, and supported by the
+        article. We avoid false urgency, decontextualized numbers, and certainty
+        the evidence cannot bear.
+      </p>
+      <h2>Disclosures</h2>
+      <p>
+        Topicora marks opinion, financial, affiliate, sponsored, and AI-assisted
+        content near the beginning. Conflicts that could reasonably influence a
+        reader’s interpretation should be described in plain language.
+      </p>
+      <h2>AI assistance</h2>
+      <p>
+        AI tools may help with outlining, language review, or production tasks
+        under human supervision. They may not publish autonomously. A human
+        remains responsible for sources, claims, originality, permissions, and
+        the final decision to publish. See the full{" "}
+        <Link href="/ai-assistance-policy">AI-Assistance Policy</Link>.
+      </p>
+      <h2>Updates and corrections</h2>
+      <p>
+        Routine clarity or formatting edits may occur without a correction note.
+        Material factual changes receive a visible update or correction. The
+        process is described in our{" "}
+        <Link href="/corrections-policy">Corrections Policy</Link>.
+      </p>
+    </PolicyPage>
+  );
 }

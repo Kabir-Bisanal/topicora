@@ -15,12 +15,17 @@ export function Pagination({
   if (totalPages <= 1) return null;
   const href = (value: number) => {
     const params = new URLSearchParams();
-    Object.entries(query).forEach(([key, item]) => item && params.set(key, item));
+    Object.entries(query).forEach(
+      ([key, item]) => item && params.set(key, item),
+    );
     params.set("page", String(value));
     return `${path}?${params.toString()}`;
   };
   return (
-    <nav className="mt-12 flex items-center justify-between border-t border-border pt-6" aria-label="Pagination">
+    <nav
+      className="border-border mt-12 flex items-center justify-between border-t pt-6"
+      aria-label="Pagination"
+    >
       {page > 1 ? (
         <Link className="button-secondary" href={href(page - 1)}>
           <ArrowLeft aria-hidden="true" size={16} /> Previous
@@ -28,7 +33,7 @@ export function Pagination({
       ) : (
         <span />
       )}
-      <span className="text-sm text-muted-foreground">
+      <span className="text-muted-foreground text-sm">
         Page {page} of {totalPages}
       </span>
       {page < totalPages ? (

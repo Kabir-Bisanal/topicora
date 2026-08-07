@@ -1,13 +1,27 @@
 import { getPublishedArticles } from "@/lib/db/articles";
 import { absoluteUrl } from "@/lib/seo/metadata";
 
-const escapeXml = (value: string) => value.replace(/[<>&'"]/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[character]!);
+const escapeXml = (value: string) =>
+  value.replace(
+    /[<>&'"]/g,
+    (character) =>
+      ({
+        "<": "&lt;",
+        ">": "&gt;",
+        "&": "&amp;",
+        "'": "&apos;",
+        '"': "&quot;",
+      })[character]!,
+  );
 
 export const revalidate = 300;
 
 export async function GET() {
   const { articles } = await getPublishedArticles({ pageSize: 30 });
-  const items = articles.slice(0, 30).map((article) => `
+  const items = articles
+    .slice(0, 30)
+    .map(
+      (article) => `
     <item>
       <title>${escapeXml(article.title)}</title>
       <link>${escapeXml(absoluteUrl(`/articles/${article.slug}`))}</link>
@@ -15,7 +29,9 @@ export async function GET() {
       <description>${escapeXml(article.excerpt)}</description>
       <category>${escapeXml(article.category.name)}</category>
       <pubDate>${new Date(article.publishedAt).toUTCString()}</pubDate>
-    </item>`).join("");
+    </item>`,
+    )
+    .join("");
   const xml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
@@ -27,5 +43,10 @@ export async function GET() {
     ${items}
   </channel>
 </rss>`;
-  return new Response(xml, { headers: { "Content-Type": "application/rss+xml; charset=utf-8", "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600" } });
+  return new Response(xml, {
+    headers: {
+      "Content-Type": "application/rss+xml; charset=utf-8",
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600",
+    },
+  });
 }

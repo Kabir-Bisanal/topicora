@@ -8,12 +8,12 @@ function validRule(value: unknown): value is RedirectRule {
   const rule = value as Partial<RedirectRule>;
   return Boolean(
     rule.from?.startsWith("/") &&
-      !rule.from.startsWith("//") &&
-      rule.to?.startsWith("/") &&
-      !rule.to.startsWith("//") &&
-      rule.from !== rule.to &&
-      !rule.from.startsWith("/admin") &&
-      !rule.to.startsWith("/admin"),
+    !rule.from.startsWith("//") &&
+    rule.to?.startsWith("/") &&
+    !rule.to.startsWith("//") &&
+    rule.from !== rule.to &&
+    !rule.from.startsWith("/admin") &&
+    !rule.to.startsWith("/admin"),
   );
 }
 
@@ -21,7 +21,10 @@ export async function getRedirectTarget(pathname: string) {
   if (!hasPublicSupabaseEnv) return null;
   if (!cached || cached.expiresAt <= Date.now()) {
     try {
-      const endpoint = new URL("/rest/v1/site_settings", publicEnv.NEXT_PUBLIC_SUPABASE_URL!);
+      const endpoint = new URL(
+        "/rest/v1/site_settings",
+        publicEnv.NEXT_PUBLIC_SUPABASE_URL!,
+      );
       endpoint.searchParams.set("key", "eq.public.redirects");
       endpoint.searchParams.set("select", "value");
       const response = await fetch(endpoint, {

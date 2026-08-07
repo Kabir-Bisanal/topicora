@@ -11,7 +11,8 @@ import {
 const sql = (value: string | null) =>
   value === null ? "null" : `'${value.replaceAll("'", "''")}'`;
 
-const values = (rows: string[][]) => rows.map((row) => `  (${row.join(", ")})`).join(",\n");
+const values = (rows: string[][]) =>
+  rows.map((row) => `  (${row.join(", ")})`).join(",\n");
 
 const articleRows = demoArticles.map((article) => [
   sql(article.id),
@@ -116,6 +117,8 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : "Seed generation failed.");
+  console.error(
+    error instanceof Error ? error.message : "Seed generation failed.",
+  );
   process.exitCode = 1;
 });

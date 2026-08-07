@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const newsletterSchema = z.object({
-  email: z.email().max(254).transform((value) => value.trim().toLowerCase()),
+  email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
   consent: z.literal(true),
   consentText: z.string().trim().min(15).max(500),
   source: z.string().trim().min(2).max(80).default("website"),
@@ -11,9 +11,11 @@ export const newsletterSchema = z.object({
 
 export const contactSchema = z.object({
   name: z.string().trim().min(2).max(100),
-  email: z.email().max(254).transform((value) => value.trim().toLowerCase()),
+  email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
   reason: z.enum(["general feedback", "correction", "business enquiry"]),
-  articleUrl: z.union([z.literal(""), z.url().max(1000)]).transform((value) => value || null),
+  articleUrl: z
+    .union([z.literal(""), z.url().max(1000)])
+    .transform((value) => value || null),
   subject: z.string().trim().min(5).max(160),
   message: z.string().trim().min(20).max(5000),
   website: z.string().max(0),

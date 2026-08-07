@@ -13,7 +13,11 @@ export const disclosureSchema = z.enum([
 export const articleInputSchema = z
   .object({
     title: z.string().trim().min(5).max(180),
-    slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(100),
+    slug: z
+      .string()
+      .trim()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .max(100),
     excerpt: z.string().trim().min(20).max(500),
     contentMarkdown: z.string().trim().min(100),
     categoryId: z.uuid(),
@@ -32,13 +36,25 @@ export const articleInputSchema = z
   })
   .superRefine((value, context) => {
     if (value.status === "published" && !value.publishedAt) {
-      context.addIssue({ code: "custom", path: ["publishedAt"], message: "Published articles need a publication date." });
+      context.addIssue({
+        code: "custom",
+        path: ["publishedAt"],
+        message: "Published articles need a publication date.",
+      });
     }
     if (value.existingCoverImageUrl && !value.coverImageAlt) {
-      context.addIssue({ code: "custom", path: ["coverImageAlt"], message: "Cover-image alt text is required." });
+      context.addIssue({
+        code: "custom",
+        path: ["coverImageAlt"],
+        message: "Cover-image alt text is required.",
+      });
     }
     if (value.disclosure !== "none" && !value.disclosureNote) {
-      context.addIssue({ code: "custom", path: ["disclosureNote"], message: "Explain the selected disclosure." });
+      context.addIssue({
+        code: "custom",
+        path: ["disclosureNote"],
+        message: "Explain the selected disclosure.",
+      });
     }
   });
 

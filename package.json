@@ -1,6 +1,7 @@
 {
   "name": "topicora",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "packageManager": "pnpm@11.20.0",
   "engines": {

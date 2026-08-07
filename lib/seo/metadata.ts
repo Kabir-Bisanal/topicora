@@ -8,7 +8,8 @@ export function absoluteUrl(path = "/") {
 }
 
 export function articleMetadata(article: PublicArticle): Metadata {
-  const canonical = article.canonicalUrl || absoluteUrl(`/articles/${article.slug}`);
+  const canonical =
+    article.canonicalUrl || absoluteUrl(`/articles/${article.slug}`);
   const image = absoluteUrl(`/articles/${article.slug}/opengraph-image`);
   return {
     title: article.seoTitle,
@@ -27,7 +28,9 @@ export function articleMetadata(article: PublicArticle): Metadata {
       authors: [article.author.displayName],
       section: article.category.name,
       tags: article.tags.map((tag) => tag.name),
-      images: [{ url: image, width: 1200, height: 630, alt: article.coverImageAlt }],
+      images: [
+        { url: image, width: 1200, height: 630, alt: article.coverImageAlt },
+      ],
     },
     twitter: {
       card: "summary_large_image",

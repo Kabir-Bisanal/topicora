@@ -64,7 +64,11 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  /* Source Serif's selection boxes are taller than its compact display
+     line-height. Mixing against the page makes the highlight opaque, so
+     adjacent selected lines cannot compound into a darker overlap band. */
+  background: color-mix(in srgb, var(--accent) 28%, var(--background));
+  color: var(--foreground);
 }
 
 :focus-visible {

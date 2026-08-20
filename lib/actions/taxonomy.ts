@@ -9,7 +9,7 @@ import { categoryInputSchema, tagInputSchema } from "@/lib/validation/taxonomy";
 export async function saveCategoryAction(formData: FormData) {
   await requireStaff("/admin/categories");
   const parsed = categoryInputSchema.safeParse({
-    id: formData.get("id"),
+    id: formData.get("id") ?? "",
     name: formData.get("name"),
     slug: formData.get("slug"),
     description: formData.get("description"),
@@ -44,7 +44,7 @@ export async function deleteCategoryAction(id: string, _formData: FormData) {
 export async function saveTagAction(formData: FormData) {
   await requireStaff("/admin/tags");
   const parsed = tagInputSchema.safeParse({
-    id: formData.get("id"),
+    id: formData.get("id") ?? "",
     name: formData.get("name"),
     slug: formData.get("slug"),
   });

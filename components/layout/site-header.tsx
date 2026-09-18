@@ -13,11 +13,30 @@ export function SiteHeader({ categories }: { categories: DemoCategory[] }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const pathname = usePathname();
 
+  // Close on route change
   useEffect(() => {
     if (detailsRef.current) {
       detailsRef.current.removeAttribute("open");
     }
   }, [pathname]);
+
+  // Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        detailsRef.current &&
+        detailsRef.current.hasAttribute("open") &&
+        !detailsRef.current.contains(event.target as Node)
+      ) {
+        detailsRef.current.removeAttribute("open");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="no-print border-border bg-background/95 sticky top-0 z-40 border-b backdrop-blur-md">

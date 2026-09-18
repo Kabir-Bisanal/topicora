@@ -1,11 +1,24 @@
+"use client";
+
 import { Menu, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import type { DemoCategory } from "@/lib/demo/articles";
 
 export function SiteHeader({ categories }: { categories: DemoCategory[] }) {
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (detailsRef.current) {
+      detailsRef.current.removeAttribute("open");
+    }
+  }, [pathname]);
+
   return (
     <header className="no-print border-border bg-background/95 sticky top-0 z-40 border-b backdrop-blur-md">
       <div className="mx-auto flex h-17 max-w-(--content-width) items-center gap-4 px-5 sm:px-7">
@@ -51,7 +64,7 @@ export function SiteHeader({ categories }: { categories: DemoCategory[] }) {
           <Search aria-hidden="true" size={19} />
         </Link>
         <ThemeToggle />
-        <details className="group relative lg:hidden">
+        <details className="group relative lg:hidden" ref={detailsRef}>
           <summary
             className="button-ghost size-11 list-none p-0"
             aria-label="Open navigation menu"

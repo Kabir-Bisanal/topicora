@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { ArticleCard } from "@/components/article/article-card";
 import { Disclosure } from "@/components/article/disclosure";
 import { Markdown } from "@/components/article/markdown";
+import { QuoteSharer } from "@/components/article/quote-sharer";
 import { ScrollProgress } from "@/components/article/scroll-progress";
 import { ShareControls } from "@/components/article/share-controls";
 import { TableOfContents } from "@/components/article/table-of-contents";
@@ -112,6 +113,13 @@ export default async function ArticlePage({
         ]}
       />
       <article>
+        <QuoteSharer
+          articleTitle={article.title}
+          authorName={article.author.displayName}
+          categoryName={article.category.name}
+          url={canonical}
+          defaultQuote={article.excerpt}
+        />
         <Container className="pt-10 sm:pt-16">
           <nav
             className="no-print text-muted-foreground mb-8 text-sm"

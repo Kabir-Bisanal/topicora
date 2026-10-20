@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Linkedin, Mail } from "lucide-react";
+import { Check, Copy, Linkedin, Mail, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 export function ShareControls({ title, url }: { title: string; url: string }) {
@@ -12,6 +12,11 @@ export function ShareControls({ title, url }: { title: string; url: string }) {
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };
+  const openQuoteCard = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("topicora:open-quote-card"));
+    }
+  };
   return (
     <div
       className="no-print flex flex-wrap items-center gap-2"
@@ -20,6 +25,15 @@ export function ShareControls({ title, url }: { title: string; url: string }) {
       <span className="text-muted-foreground mr-1 text-xs font-bold tracking-wider uppercase">
         Share
       </span>
+      <button
+        className="button-secondary gap-1.5"
+        type="button"
+        onClick={openQuoteCard}
+        aria-label="Create editorial quote card"
+      >
+        <Sparkles aria-hidden="true" size={15} className="text-accent" />
+        <span className="text-xs font-bold">Quote card</span>
+      </button>
       <a
         className="button-secondary"
         href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}

@@ -23,7 +23,14 @@ export function SiteFooter() {
             alt="Topicora"
             width={160}
             height={36}
-            className="h-8 w-auto dark:invert"
+            className="h-8 w-auto dark:hidden"
+          />
+          <Image
+            src="/logo-dark.svg"
+            alt="Topicora"
+            width={160}
+            height={36}
+            className="hidden h-8 w-auto dark:block"
           />
           <p className="text-muted-foreground mt-4 max-w-sm text-sm leading-6">
             Useful ideas, wherever curiosity leads. An India-first English

@@ -39,7 +39,7 @@ export function SiteHeader({ categories }: { categories: DemoCategory[] }) {
   }, []);
 
   return (
-    <header className="no-print border-border bg-background/95 sticky top-0 z-40 border-b backdrop-blur-md">
+    <header className="no-print border-header-border bg-header-bg/95 sticky top-0 z-40 border-b backdrop-blur-md transition-colors">
       <div className="mx-auto flex h-17 max-w-(--content-width) items-center gap-4 px-5 sm:px-7">
         <Link
           href="/"
@@ -52,7 +52,15 @@ export function SiteHeader({ categories }: { categories: DemoCategory[] }) {
             width={160}
             height={36}
             priority
-            className="h-8 w-auto dark:invert"
+            className="h-8 w-auto dark:hidden"
+          />
+          <Image
+            src="/logo-dark.svg"
+            alt="Topicora"
+            width={160}
+            height={36}
+            priority
+            className="hidden h-8 w-auto dark:block"
           />
         </Link>
         <nav

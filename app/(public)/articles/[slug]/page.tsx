@@ -181,7 +181,7 @@ export default async function ArticlePage({
           </figure>
         </Container>
 
-        <Container className="mt-12 grid items-start gap-10 lg:grid-cols-[15rem_minmax(0,var(--reading-width))_1fr] lg:justify-center">
+        <Container className="mt-12 grid items-start gap-10 lg:grid-cols-[15rem_minmax(0,var(--reading-width))] lg:justify-center">
           <aside className="no-print lg:sticky lg:top-24">
             <TableOfContents items={toc} />
           </aside>

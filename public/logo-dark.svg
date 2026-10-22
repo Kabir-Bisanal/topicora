@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 90" role="img" aria-labelledby="title desc">
+  <title id="title">Topicora</title>
+  <desc id="desc">Topicora wordmark with a compass page symbol (dark mode)</desc>
+  <g transform="translate(2 9)">
+    <rect x="4" y="1" width="62" height="70" rx="15" fill="none" stroke="#f4f1e9" stroke-width="5"/>
+    <path d="M20 53 34 22l19-8-9 19-24 20Z" fill="#83b8aa"/>
+    <circle cx="38" cy="28" r="5" fill="#151716"/>
+  </g>
+  <text x="84" y="62" fill="#f4f1e9" font-family="Georgia, 'Times New Roman', serif" font-size="62" font-weight="700" letter-spacing="-2">Topicora</text>
+</svg>

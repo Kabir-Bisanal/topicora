@@ -42,7 +42,15 @@ export function AdminNav({ name, role }: { name: string; role: string }) {
             width={145}
             height={34}
             priority
-            className="h-7 w-auto dark:invert"
+            className="h-7 w-auto dark:hidden"
+          />
+          <Image
+            src="/logo-dark.svg"
+            alt="Topicora CMS"
+            width={145}
+            height={34}
+            priority
+            className="hidden h-7 w-auto dark:block"
           />
         </Link>
         <div className="mt-0 text-right lg:mt-6 lg:text-left">

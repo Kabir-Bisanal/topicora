@@ -5,12 +5,12 @@ import { ArticleCard } from "@/components/article/article-card";
 import { Container } from "@/components/ui/container";
 import { Pagination } from "@/components/ui/pagination";
 import { getAllTags, getPublishedArticles } from "@/lib/db/articles";
-import { demoTags } from "@/lib/demo/articles";
 
 export const revalidate = 300;
 export const dynamicParams = true;
-export function generateStaticParams() {
-  return demoTags.map(({ slug }) => ({ slug }));
+export async function generateStaticParams() {
+  const tags = await getAllTags();
+  return tags.map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({

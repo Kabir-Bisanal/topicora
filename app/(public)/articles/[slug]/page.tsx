@@ -16,9 +16,9 @@ import { Container } from "@/components/ui/container";
 import {
   getArticleBySlug,
   getArticleNavigation,
+  getPublishedArticles,
   getRelatedArticles,
 } from "@/lib/db/articles";
-import { demoArticles } from "@/lib/demo/articles";
 import { extractTableOfContents } from "@/lib/markdown/toc";
 import { absoluteUrl, articleMetadata } from "@/lib/seo/metadata";
 import { formatDate } from "@/lib/utils/date";
@@ -26,8 +26,9 @@ import { formatDate } from "@/lib/utils/date";
 export const revalidate = 300;
 export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return demoArticles.map(({ slug }) => ({ slug }));
+export async function generateStaticParams() {
+  const { articles } = await getPublishedArticles({ pageSize: 50 });
+  return articles.map((article) => ({ slug: article.slug }));
 }
 
 export async function generateMetadata({

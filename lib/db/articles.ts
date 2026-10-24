@@ -1,5 +1,6 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 import {
@@ -11,7 +12,7 @@ import {
   type DemoCategory,
   type DemoTag,
 } from "@/lib/demo/articles";
-import { createClient } from "@/lib/supabase/server";
+import { getPublicSupabase } from "@/lib/supabase/public";
 import { normalizeSearchQuery } from "@/lib/validation/search";
 
 export type PublicArticle = DemoArticle & {
@@ -42,7 +43,7 @@ type ArticleRow = {
   title: string;
   slug: string;
   excerpt: string;
-  content_markdown: string;
+  content_markdown?: string | null;
   cover_image_url: string | null;
   cover_image_alt: string | null;
   cover_image_caption: string | null;
@@ -78,7 +79,7 @@ function mapArticle(row: ArticleRow): PublicArticle {
     title: row.title,
     slug: row.slug,
     excerpt: row.excerpt,
-    contentMarkdown: row.content_markdown,
+    contentMarkdown: row.content_markdown ?? "",
     category: {
       id: row.category.id,
       name: row.category.name,
@@ -86,7 +87,7 @@ function mapArticle(row: ArticleRow): PublicArticle {
       description: row.category.description,
       sortOrder: row.category.sort_order,
     },
-    tags: row.article_tags.map(({ tag }) => tag).filter(Boolean),
+    tags: row.article_tags ? row.article_tags.map(({ tag }) => tag).filter(Boolean) : [],
     coverImageUrl: row.cover_image_url ?? "/demo/ai-search.svg",
     coverImageAlt: row.cover_image_alt ?? "Topicora article cover",
     coverImageCaption: row.cover_image_caption ?? "",
@@ -123,7 +124,19 @@ function filterDemo(categorySlug?: string, tagSlug?: string) {
     );
 }
 
-const articleSelect = `
+// Lightweight select for listings, cards, and navigation (avoids transferring megabytes of markdown text)
+const articleCardSelect = `
+  id, author_id, title, slug, excerpt, cover_image_url,
+  cover_image_alt, cover_image_caption, disclosure, disclosure_note,
+  is_featured, published_at, updated_at, seo_title, seo_description,
+  reading_time_minutes, canonical_url,
+  category:categories!articles_category_id_fkey(id,name,slug,description,sort_order),
+  author:profiles!articles_author_id_fkey(id,display_name,slug,bio),
+  article_tags(tag:tags(id,name,slug))
+`;
+
+// Full select used only for reading a full single article
+const articleDetailSelect = `
   id, author_id, title, slug, excerpt, content_markdown, cover_image_url,
   cover_image_alt, cover_image_caption, disclosure, disclosure_note,
   is_featured, published_at, updated_at, seo_title, seo_description,
@@ -133,18 +146,15 @@ const articleSelect = `
   article_tags(tag:tags(id,name,slug))
 `;
 
-export async function getPublishedArticles(
-  options: {
-    page?: number;
-    pageSize?: number;
-    categorySlug?: string;
-    tagSlug?: string;
-  } = {},
-): Promise<ArticleList> {
-  const page = Math.max(1, options.page ?? 1);
-  const pageSize = Math.min(50, Math.max(1, options.pageSize ?? 12));
-  const fallback = filterDemo(options.categorySlug, options.tagSlug);
-  const supabase = await createClient();
+async function executeGetPublishedArticles(options: {
+  page: number;
+  pageSize: number;
+  categorySlug?: string;
+  tagSlug?: string;
+}): Promise<ArticleList> {
+  const { page, pageSize, categorySlug, tagSlug } = options;
+  const fallback = filterDemo(categorySlug, tagSlug);
+  const supabase = getPublicSupabase();
   if (!supabase) {
     return {
       articles: fallback.slice((page - 1) * pageSize, page * pageSize),
@@ -154,22 +164,22 @@ export async function getPublishedArticles(
 
   try {
     let categoryId: string | undefined;
-    if (options.categorySlug) {
+    if (categorySlug) {
       const { data } = await supabase
         .from("categories")
         .select("id")
-        .eq("slug", options.categorySlug)
+        .eq("slug", categorySlug)
         .maybeSingle();
       categoryId = data?.id;
       if (!categoryId) return { articles: [], total: 0 };
     }
 
     let taggedArticleIds: string[] | undefined;
-    if (options.tagSlug) {
+    if (tagSlug) {
       const { data: tag } = await supabase
         .from("tags")
         .select("id")
-        .eq("slug", options.tagSlug)
+        .eq("slug", tagSlug)
         .maybeSingle();
       if (!tag) return { articles: [], total: 0 };
       const { data: links } = await supabase
@@ -182,7 +192,7 @@ export async function getPublishedArticles(
 
     let query = supabase
       .from("articles")
-      .select(articleSelect, { count: "exact" })
+      .select(articleCardSelect, { count: "exact" })
       .eq("status", "published")
       .lte("published_at", new Date().toISOString())
       .order("published_at", { ascending: false })
@@ -204,53 +214,98 @@ export async function getPublishedArticles(
   }
 }
 
-export const getArticleBySlug = cache(async (slug: string) => {
-  const fallback = demoArticles.find((article) => article.slug === slug);
-  const supabase = await createClient();
-  if (!supabase) return fallback ? asPublicArticle(fallback) : null;
+export async function getPublishedArticles(
+  options: {
+    page?: number;
+    pageSize?: number;
+    categorySlug?: string;
+    tagSlug?: string;
+  } = {},
+): Promise<ArticleList> {
+  const page = Math.max(1, options.page ?? 1);
+  const pageSize = Math.min(50, Math.max(1, options.pageSize ?? 12));
+  const categorySlug = options.categorySlug ?? "";
+  const tagSlug = options.tagSlug ?? "";
 
-  try {
-    const { data, error } = await supabase
-      .from("articles")
-      .select(articleSelect)
-      .eq("slug", slug)
-      .eq("status", "published")
-      .lte("published_at", new Date().toISOString())
-      .maybeSingle();
-    if (error) throw error;
-    return data ? mapArticle(data as unknown as ArticleRow) : null;
-  } catch {
-    return fallback ? asPublicArticle(fallback) : null;
-  }
+  const cachedFetch = unstable_cache(
+    async (p: number, ps: number, cSlug: string, tSlug: string) => {
+      return executeGetPublishedArticles({
+        page: p,
+        pageSize: ps,
+        categorySlug: cSlug || undefined,
+        tagSlug: tSlug || undefined,
+      });
+    },
+    ["published-articles-list"],
+    { revalidate: 60, tags: ["articles"] },
+  );
+
+  return cachedFetch(page, pageSize, categorySlug, tagSlug);
+}
+
+export const getArticleBySlug = cache(async (slug: string) => {
+  const cachedFetch = unstable_cache(
+    async (s: string) => {
+      const fallback = demoArticles.find((article) => article.slug === s);
+      const supabase = getPublicSupabase();
+      if (!supabase) return fallback ? asPublicArticle(fallback) : null;
+
+      try {
+        const { data, error } = await supabase
+          .from("articles")
+          .select(articleDetailSelect)
+          .eq("slug", s)
+          .eq("status", "published")
+          .lte("published_at", new Date().toISOString())
+          .maybeSingle();
+        if (error) throw error;
+        return data ? mapArticle(data as unknown as ArticleRow) : null;
+      } catch {
+        return fallback ? asPublicArticle(fallback) : null;
+      }
+    },
+    ["article-detail-by-slug"],
+    { revalidate: 300, tags: ["articles", `article-${slug}`] },
+  );
+
+  return cachedFetch(slug);
 });
 
-export async function getAllCategories(): Promise<DemoCategory[]> {
-  const supabase = await createClient();
-  if (!supabase) return demoCategories;
-  const { data } = await supabase
-    .from("categories")
-    .select("id,name,slug,description,sort_order")
-    .order("sort_order");
-  return data?.length
-    ? data.map((item) => ({
-        id: item.id,
-        name: item.name,
-        slug: item.slug,
-        description: item.description,
-        sortOrder: item.sort_order,
-      }))
-    : demoCategories;
-}
+export const getAllCategories = unstable_cache(
+  async (): Promise<DemoCategory[]> => {
+    const supabase = getPublicSupabase();
+    if (!supabase) return demoCategories;
+    const { data } = await supabase
+      .from("categories")
+      .select("id,name,slug,description,sort_order")
+      .order("sort_order");
+    return data?.length
+      ? data.map((item) => ({
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          description: item.description,
+          sortOrder: item.sort_order,
+        }))
+      : demoCategories;
+  },
+  ["public-all-categories"],
+  { revalidate: 3600, tags: ["categories"] },
+);
 
-export async function getAllTags(): Promise<DemoTag[]> {
-  const supabase = await createClient();
-  if (!supabase) return demoTags;
-  const { data } = await supabase
-    .from("tags")
-    .select("id,name,slug")
-    .order("name");
-  return data?.length ? data : demoTags;
-}
+export const getAllTags = unstable_cache(
+  async (): Promise<DemoTag[]> => {
+    const supabase = getPublicSupabase();
+    if (!supabase) return demoTags;
+    const { data } = await supabase
+      .from("tags")
+      .select("id,name,slug")
+      .order("name");
+    return data?.length ? data : demoTags;
+  },
+  ["public-all-tags"],
+  { revalidate: 3600, tags: ["tags"] },
+);
 
 export async function getFeaturedArticle() {
   const { articles } = await getPublishedArticles({ pageSize: 12 });
@@ -258,7 +313,7 @@ export async function getFeaturedArticle() {
 }
 
 export async function getRelatedArticles(article: PublicArticle) {
-  const { articles } = await getPublishedArticles({ pageSize: 50 });
+  const { articles } = await getPublishedArticles({ pageSize: 30 });
   return articles
     .filter((candidate) => candidate.id !== article.id)
     .map((candidate) => ({
@@ -290,7 +345,7 @@ export async function searchPublishedArticles(
 ): Promise<SearchResult[]> {
   const normalized = normalizeSearchQuery(query);
   if (!normalized) return [];
-  const supabase = await createClient();
+  const supabase = getPublicSupabase();
 
   if (supabase) {
     const { data, error } = await supabase.rpc("search_published_articles", {
